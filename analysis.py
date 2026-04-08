@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 
@@ -38,7 +37,9 @@ def compute_kpis(df: pd.DataFrame) -> dict[str, float]:
     }
 
 
-def detect_anomalies(df: pd.DataFrame, z_threshold: float = 2.0) -> pd.DataFrame:
+def detect_anomalies(
+    df: pd.DataFrame, z_threshold: float = 2.0
+) -> pd.DataFrame:
     """Flag rows where sessions deviate significantly from the mean.
 
     Uses z-score on non-null values. Rows with |z| > z_threshold are flagged.
@@ -58,7 +59,10 @@ def detect_anomalies(df: pd.DataFrame, z_threshold: float = 2.0) -> pd.DataFrame
 
     mean = valid.mean()
     std = valid.std()
-    z_scores = (df["sessions"] - mean) / std if std > 0 else 0.0
+    if std > 0:
+        z_scores = (df["sessions"] - mean) / std
+    else:
+        z_scores = 0.0
     df["is_anomaly"] = z_scores.abs() > z_threshold
     return df
 
@@ -74,5 +78,7 @@ def add_moving_average(df: pd.DataFrame, window: int = 7) -> pd.DataFrame:
         DataFrame with an extra 'sessions_ma' column.
     """
     df = df.copy()
-    df["sessions_ma"] = df["sessions"].rolling(window=window, min_periods=1).mean()
+    df["sessions_ma"] = (
+        df["sessions"].rolling(window=window, min_periods=1).mean()
+    )
     return df
