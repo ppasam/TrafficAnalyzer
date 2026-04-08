@@ -40,6 +40,29 @@ streamlit run app.py --server.headless true --server.port 8501
 kill $(lsof -t -i:8501)
 ```
 
+## Запуск тестов
+
+```bash
+cd /home/ppasam/Documents/projects/TrafficAnalyzer
+source venv/bin/activate
+
+# Запустить все тесты
+pytest test_analysis.py -v
+
+# Или без активации venv:
+venv/bin/python -m pytest test_analysis.py -v
+```
+
+Проверка стиля:
+
+```bash
+# PEP 8 — linting
+venv/bin/python -m flake8 analysis.py test_analysis.py
+
+# Автоформатирование
+venv/bin/python -m black --line-length 79 analysis.py test_analysis.py
+```
+
 ## Если переименовал папку — venv нужно пересоздать
 
 ```bash
