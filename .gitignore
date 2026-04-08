@@ -24,4 +24,6 @@ build/
 Thumbs.db
 
 # Application data
-docs/
+# Ignore everything in docs/ except synthetic_traffic.csv
+docs/*
+!docs/synthetic_traffic.csv
