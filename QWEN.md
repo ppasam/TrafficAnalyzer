@@ -8,6 +8,7 @@ This project provides:
 - A **synthetic data generator** that creates realistic 3-year web traffic data with trends, seasonality, anomalies, and missing values.
 - An **interactive dashboard** for exploring traffic data with KPIs, charts, and filters.
 - A **help page** documenting the expected CSV input format.
+- A **unit test suite** for the analysis module.
 
 ## Tech Stack
 
@@ -16,6 +17,9 @@ This project provides:
 - **pandas** — data manipulation
 - **numpy** — numerical operations
 - **plotly** — interactive charts
+- **pytest** — testing framework
+- **flake8** — PEP 8 linting
+- **black** — code formatting (line-length 79)
 
 ## Project Structure
 
@@ -26,6 +30,7 @@ This project provides:
 ├── analysis.py                 # Data analysis: KPIs, anomaly detection, moving average
 ├── plotting.py                 # Plotly chart functions (line, bar charts)
 ├── generate_synthetic_traffic.py # Script to generate synthetic traffic data
+├── test_analysis.py            # Unit tests for analysis module
 ├── serve.sh                    # Start/stop/status helper script
 ├── aliases.sh                  # Shell aliases (for ~/.bashrc)
 ├── pages/
@@ -37,6 +42,11 @@ This project provides:
 ├── .gitignore                  # Git ignore rules
 └── QWEN.md                     # This file
 ```
+
+## Repository
+
+- **GitHub:** https://github.com/ppasam/TrafficAnalyzer
+- **SSH remote:** `git@github.com:ppasam/TrafficAnalyzer.git`
 
 ## Running the App
 
@@ -87,6 +97,8 @@ source venv/bin/activate
 
 ```bash
 pip install streamlit pandas numpy plotly
+# For development:
+pip install pytest flake8 black
 ```
 
 ### 3. Generate synthetic data (optional)
@@ -96,6 +108,48 @@ python3 generate_synthetic_traffic.py
 ```
 
 This creates `docs/synthetic_traffic.csv` with 1096 days of data (2022-01-01 to 2024-12-31).
+
+### 4. Set up SSH authentication
+
+The project uses SSH to push to GitHub. Key: `~/.ssh/ppa_key`.
+Before pushing, add it to the agent:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/ppa_key
+```
+
+### 5. Git push
+
+```bash
+git add -A && git commit -m "..." && git push
+```
+
+## Testing
+
+### Run tests
+
+```bash
+venv/bin/python -m pytest test_analysis.py -v
+```
+
+### Check style
+
+```bash
+# PEP 8 linting
+venv/bin/python -m flake8 analysis.py test_analysis.py
+
+# Auto-formatting
+venv/bin/python -m black --line-length 79 analysis.py test_analysis.py
+```
+
+### Test coverage
+
+The `analysis.py` module has **14 unit tests** covering:
+- `filter_by_date` — inclusive range, no match, full range
+- `compute_kpis` — normal data, NaN handling, empty DataFrame
+- `detect_anomalies` — outlier flagging, no anomalies, too few rows, custom threshold, immutability
+- `add_moving_average` — default/custom window, immutability
 
 ## Features
 
@@ -131,14 +185,29 @@ This creates `docs/synthetic_traffic.csv` with 1096 days of data (2022-01-01 to 
 | `analysis.py` | Date filtering, KPI computation, z-score anomaly detection, moving average | < 400 |
 | `plotting.py` | Plotly chart creation (line, bar) | < 400 |
 | `pages/help.py` | Static help content | < 400 |
+| `test_analysis.py` | Unit tests for analysis module | — |
+
+### Public API: `analysis.py`
+
+```
+filter_by_date(df, start, end)        → DataFrame
+compute_kpis(df)                       → dict[str, float]
+detect_anomalies(df, z_threshold=2.0)  → DataFrame
+add_moving_average(df, window=7)       → DataFrame
+_compute_z_scores(series)              → Series  (private)
+```
 
 ## Development Conventions
 
-- **PEP 8** — all code follows standard Python style
+- **PEP 8** — all code follows standard Python style, enforced by flake8
 - **Type hints** — all function parameters and return values are annotated
 - **Docstrings** — every function has a docstring with Args/Returns/Raises
 - **Modularity** — no file exceeds 400 lines
+- **Formatting** — black with `--line-length 79`
+- **Line length** — 79 characters (flake8 default)
 - **Data directory** — all generated/sample data lives in `docs/`, excluded from git via `.gitignore`
+- **Module constants** — column names and default parameters are defined at module level (`analysis.py`)
+- **Immutability** — analysis functions return copies; input DataFrames are not mutated
 
 ## Expected CSV Format
 
@@ -150,3 +219,15 @@ date,sessions
 
 - `date`: ISO 8601 format (`YYYY-MM-DD`), parsed as datetime
 - `sessions`: numeric (int/float), NaN values allowed
+
+## Common Commands Quick Reference
+
+```bash
+# Development workflow
+./serve.sh start                          # start app
+venv/bin/python -m pytest test_analysis.py -v  # run tests
+venv/bin/python -m flake8 *.py            # lint check
+venv/bin/python -m black --line-length 79 *.py  # format
+git add -A && git commit -m "..." && git push   # commit & push
+./serve.sh stop                           # stop app
+```
