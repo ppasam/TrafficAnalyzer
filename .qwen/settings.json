@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source *)",
+      "Bash(python3 *)",
+      "Bash(pip install *)",
+      "Bash(sleep *)",
+      "Bash(ss *)",
+      "Bash(kill *)",
+      "Bash(mkdir *)",
+      "Bash(streamlit *)",
+      "Bash(venv/bin/pip *)",
+      "Bash(rm *)",
+      "Bash(lsof *)",
+      "Bash(xargs *)",
+      "Bash(venv/bin/python *)",
+      "Bash(chmod *)"
+    ]
+  },
+  "$version": 3
+}
