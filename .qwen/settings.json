@@ -17,7 +17,13 @@
       "Bash(chmod *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(docker build *)",
+      "Bash(sudo *)",
+      "Bash(docker run *)",
+      "Bash(docker rm *)",
+      "Bash(docker ps *)",
+      "Bash(docker logs *)"
     ]
   },
   "$version": 3
